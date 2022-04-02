@@ -7,21 +7,24 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin()
-" requires
+Plug 'google/vim-maktaba'
+Plug 'google/vim-codefmt'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'arcticicestudio/nord-vim'
+
+" Also add Glaive, which is used to configure codefmt's maktaba flags. See
+" `:help :Glaive` for usage.
+Plug 'google/vim-glaive'
 Plug 'tpope/vim-sensible'
-Plug 'joshdick/onedark.vim'
-Plug 'puremourning/vimspector', {
-  \ 'do': 'python3 install_gadget.py --enable-vscode-cpptools'
-  \ }
-Plug 'uarun/vim-protobuf'
 Plug 'ctrlpvim/ctrlp.vim'
+Plug 'joshdick/onedark.vim'
 Plug 'iwataka/ctrlproj.vim'
 Plug 'sgur/ctrlp-extensions.vim'
 Plug 'dkarter/bullets.vim'
 Plug 'itchyny/screensaver.vim'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'tpope/vim-dadbod'
-Plug 'sbdchd/neoformat'
+" Plug 'github/copilot.vim'
 " Theme
 Plug 'yunlingz/equinusocio-material.vim'
 " Frontend
@@ -38,7 +41,7 @@ Plug 'mileszs/ack.vim'
 Plug 'voldikss/vim-floaterm'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'dsznajder/vscode-es7-javascript-react-snippets', { 'do': 'yarn install --frozen-lockfile && yarn compile' }
+"Plug 'dsznajder/vscode-es7-javascript-react-snippets', { 'do': 'yarn install --frozen-lockfile && yarn compile' }
 Plug 'mhartington/oceanic-next'
 Plug 'tpope/vim-fugitive'
 Plug 'mattn/emmet-vim'
@@ -46,6 +49,7 @@ Plug 'itchyny/calendar.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'joshdick/onedark.vim'
 Plug 'junegunn/goyo.vim'
+Plug 'leafgarland/typescript-vim'
 "ipython
 Plug 'jpalardy/vim-slime', { 'for': 'python' }
 Plug 'hanschen/vim-ipython-cell', { 'for': 'python' }
@@ -70,29 +74,28 @@ Plug 'dense-analysis/ale'
 Plug 'majutsushi/tagbar'
 Plug 'xuhdev/SingleCompile'
 Plug 'puremourning/vimspector'
+" Plug 'vim-scripts/indentpython.eim'
 Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 " java gradle
 Plug 'tfnico/Vim-Gradle'
-Plug 'bpdp/vim-java'
 Plug 'lepture/vim-jinja'
 Plug 'pangloss/vim-javascript'
 Plug 'alvan/vim-closetag'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'terryma/vim-multiple-cursors'
-Plug 'vim-syntastic/syntastic'
 Plug 'eclipse/eclipse.jdt.ls'
-Plug 'uiiaoo/java-syntax.vim'
+" Plug 'uiiaoo/java-syntax.vim'
+Plug 'vim-test/vim-test'
 Plug 'Quramy/tsuquyomi'
-Plug 'cocopon/iceberg.vim'
 " Plug 'ternjs/tern_for_vim'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/es.next.syntax.vim'
 Plug 'scrooloose/nerdcommenter'
 Plug 'NLKNguyen/papercolor-theme'
+" Plug 'adelarsq/vim-devicons-emoji'
 Plug 'dense-analysis/ale'
 Plug 'diepm/vim-rest-console'
 Plug 'vim-python/python-syntax'
-" Plug 'leafgarland/typescript-vim'
 Plug 'psf/black', { 'branch': 'stable' }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -104,7 +107,7 @@ Plug 'kristijanhusak/vim-hybrid-material'
 " Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'jparise/vim-graphql'
 Plug 'HerringtonDarkholme/yats.vim'
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'GroovyLanguageServer/groovy-language-server'
 Plug 'Maxattax97/coc-ccls'
 Plug 'Scuilion/gradle-syntastic-plugin'
@@ -114,6 +117,7 @@ Plug 'Yggdroot/indentLine'
 Plug 'ryanoasis/vim-devicons'
 call plug#end()
 
+"packadd! vimspector
 
 hi IndentGuidesOdd ctermbg=black
 set nobackup
@@ -130,14 +134,111 @@ if need_to_install_plugins == 1
     q
 endif
 
+call glaive#Install()
+" Optional: Enable codefmt's default mappings on the <Leader>= prefix.
+Glaive codefmt plugin[mappings]
+Glaive codefmt google_java_executable="java -jar /home/jongyunha/Downloads/google-java-format-1.13.0-all-deps.jar"
+
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType xml setlocal ts=2 sts=2 sw=2 expandtab
+
+
+augroup autoformat_settings
+  autocmd FileType bzl AutoFormatBuffer buildifier
+  autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
+  autocmd FileType dart AutoFormatBuffer dartfmt
+  autocmd FileType go AutoFormatBuffer gofmt
+  autocmd FileType gn AutoFormatBuffer gn
+  autocmd FileType java AutoFormatBuffer google-java-format
+  autocmd FileType python AutoFormatBuffer yapf
+  " Alternative: autocmd FileType python AutoFormatBuffer autopep8
+  autocmd FileType rust AutoFormatBuffer rustfmt
+  autocmd FileType vue AutoFormatBuffer prettier
+augroup END
+
 " goyo
 let g:goyo_width = 80
 nnoremap <silent> <leader>z :Goyo<cr>
-" nnoremap <F3> :SCCompileRunAF -g Wall -Wextra -std=c++2a<cr>
-nmap <F2> :FloatermNew --autoclose=0 g++ % -o %< && ./%<<CR>
-let g:vimspector_enable_mappings = 'HUMAN'
+nnoremap <F9> :SCCompileRunAF -g -Wall -Wextra -std=c++2a<cr>
 
-"ctrlp
+let test#strategy = {
+  \ 'nearest': 'neovim',
+  \ 'file':    'dispatch',
+  \ 'suite':   'basic',
+\}
+
+" DB list
+" localhost
+
+let g:dadbods = []
+let db = {
+		\"name": "localhost vigilate",
+		\"url": "postgresql://jongyunha@localhost/vigilate"
+		\}
+
+call add(g:dadbods, db)
+
+let db = {
+		\"name": "mboard-dev",
+		\"url": "postgresql://syncsign-mboard-psql.postgres.database.azure.com/postgres?user=s2admin&password=qwerasdf1!2@"
+		\}
+
+call add(g:dadbods, db)
+
+let db = {
+		\"name": "mboard-prod",
+		\"url": "postgresql://menuboard-postgres-dev.postgres.database.azure.com/postgres?user=elbigs@menuboard-postgres-dev&password=qwerasdf1!"
+		\}
+
+call add(g:dadbods, db)
+
+let g:db = g:dadbods[2].url
+
+command! DBSelect :call popup_menu(map(copy(g:dadbods), {k,v -> v.name}), {
+			\"callback": 'DBSelected'
+			\})
+
+func! DBSelected(id, result)
+	if a:result != -1
+		let b:db = g:dadbods[a:result-1].url
+		echomsg 'DB ' . g:dadbods[a:result-1].name . ' is selected.'
+	endif
+endfunc
+
+"" operator mapping
+func! DBExe(...)
+	if !a:0
+		let &operatorfunc = matchstr(expand('<sfile>'), '[^. ]*$')
+		return 'g@'
+	endif
+	let sel_save = &selection
+	let &selection = "inclusive"
+	let reg_save = @@
+
+	if a:1 == 'char'	" Invoked from Visual mode, use gv command.
+		silent exe 'normal! gvy'
+	elseif a:1 == 'line'
+		silent exe "normal! '[V']y"
+	else
+		silent exe 'normal! `[v`]y'
+	endif
+
+	execute "DB " . @@
+
+	let &selection = sel_save
+	let @@ = reg_save
+endfunc
+
+xnoremap <expr> <Plug>(DBExe)     DBExe()
+nnoremap <expr> <Plug>(DBExe)     DBExe()
+nnoremap <expr> <Plug>(DBExeLine) DBExe() . '_'
+
+xmap <leader>db  <Plug>(DBExe)
+nmap <leader>db  <Plug>(DBExe)
+omap <leader>db  <Plug>(DBExe)
+nmap <leader>dbb <Plug>(DBExeLine)
+
+ "ctrlp
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " Linux/MacOSX
 let g:ctrlp_available=1
 let g:ctrlp_by_filename=1
@@ -209,23 +310,26 @@ let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6  }}
 " [Buffers] Jump to the existing window if possible
 let g:fzf_buffers_jump = 1
 " [Tags] Command to generate tags file
-" let g:fzf_tags_command = 'ctags -R'
+let g:fzf_tags_command = 'ctags -R'
 
 " [Commands] --expect expression for directly executing the command
 let g:fzf_commands_expect = 'alt-enter,ctrl-x'
 
+let g:typescript_opfirst='\%([<>=,?^%|*/&]\|\([-:+]\)\1\@!\|!=\|in\%(stanceof\)\=\>\)'
+
 " Remap keys for applying codeAction to the current buffer.
 nmap <leader>ac  <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
+ " Apply AutoFix to problem on the current line.
 nmap <leader>qf  <Plug>(coc-fix-current)
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-" Symbol renaming.
+ " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
 let g:syntastic_java_checkers = []
+
 "ipython
 "always use tmux
 let g:slime_target = 'tmux'
@@ -270,20 +374,19 @@ function! s:gitModified()
     return map(files, "{'line': v:val, 'path': v:val}")
 endfunction
 
-" same as above, but show untracked files, honouring .gitignore
+ " same as above, but show untracked files, honouring .gitignore
 function! s:gitUntracked()
     let files = systemlist('git ls-files -o --exclude-standard 2>/dev/null')
     return map(files, "{'line': v:val, 'path': v:val}")
 endfunction
 
+" Nerd commenter
 " Highlight the symbol and its references when holding the cursor.
 " autocmd CursorHold * silent call CocActionAsync('highlight')
 " always show the status bar
 set laststatus=2
 
 " enable 256 colors
-set t_Co=256
-set t_ut=256
 
 " turn on line numbering
 set number
@@ -315,6 +418,7 @@ filetype plugin indent on
 syntax enable                               " syntax highlight
 
 set t_Co=256                                " set 256 colors
+" set t_ut=256
 
 set number                                  " show line numbers
 set ruler
@@ -343,8 +447,10 @@ set clipboard=unnamed                       " use system clipboard
 
 set exrc                                    " enable usage of additional .vimrc files from working directory
 set secure                                  " prohibit .vimrc files to execute shell, create files, etc...
+highlight Normal ctermbg=NONE
+highlight nonText ctermbg=NONE
 
-" Additional mappings for Esc (useful for MacBook with touch bar)
+ " Additional mappings for Esc (useful for MacBook with touch bar)
 "inoremap jj <Esc>
 "inoremap jk <Esc>
 
@@ -373,14 +479,18 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
-let g:syntastic_cpp_compiler = 'clangd'
+let g:syntastic_cpp_compiler = 'g++'
 let g:syntastic_cpp_compiler_options = "-std=c++17 -Wall -Wextra -Wpedantic"
-let g:syntastic_c_compiler_options = "-std=c17 -Wall -Wextra -Wpedantic""
+" let g:syntastic_c_compiler_options = "-std=c17 -Wall -Wextra -Wpedantic""
+
+" let g:syntastic_cpp_compiler = 'clang++'
+" let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 "devicons
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 " set guifont=:h
-set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types\ 11
+set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
+
 
 " python executables for different plugins
 let g:pymode_python='python3'
@@ -414,7 +524,7 @@ let g:pymode_virtualenv=1
 let g:pymode_breakpoint=1
 let g:pymode_breakpoint_key='<leader>b'
 
-" syntax highlight
+" syntax highligh
 let g:pymode_syntax=1
 let g:pymode_syntax_slow_sync=1
 let g:pymode_syntax_all=1
@@ -443,7 +553,7 @@ augroup vimrc_autocmds
     autocmd FileType python,rst,c,cpp set colorcolumn=90
 augroup END
 
-" 주석처리
+ " 주석처리
 " " Create default mappings
 let g:NERDCreateDefaultMappings = 1
 
@@ -458,7 +568,6 @@ let g:NERDDefaultAlign = 'left'
 
 " Set a language to use its alternate delimiters by default
 let g:NERDAltDelims_java = 1
-
 " Add your own custom formats or override the defaults
 let g:NERDCustomDelimiters = { 'c': { 'left': '/**','right': '*/' } }
 
@@ -475,11 +584,7 @@ map <Leader>c<space> <plug>NERDComComment
 
 " guifont
 autocmd FileType nerdtree setlocal nolist
-let g:NERDTreeFileExtensionHighlightFullName = 1
-let g:NERDTreeExactMatchHighlightFullName = 1
-let g:NERDTreePatternMatchHighlightFullName = 1
-let g:WebDevIconsNerdTreeAfterGlyphPadding = '  '
-
+ let g:WebDevIconsNerdTreeAfterGlyphPadding = '  '
 " code folding
 let g:pymode_folding=0
 
@@ -513,6 +618,7 @@ let g:syntastic_mode_map = { 'passive_filetypes': ['python'] }
 
 autocmd BufWritePre *.py execute ':Black'
 nmap <C-b> :Black<CR>
+
 nmap <C-q> :Translate<CR>
 nmap <C-s> :w<CR>
 
@@ -525,6 +631,7 @@ set viminfo='25,\"50,n~/.viminfo
 augroup vimrc-javascript
   autocmd!
   autocmd FileType javascript set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
+  autocmd FileType go set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
   autocmd FileType vue set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
   autocmd FileType jsx set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
   autocmd FileType tsx set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
@@ -535,7 +642,6 @@ augroup vimrc-javascript
   autocmd FileType jet set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
   autocmd FileType css set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
   autocmd FileType svelte set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
-  autocmd FileType cpp set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
 augroup END
 "" ale linters
 let g:ale_linters = {
@@ -545,20 +651,14 @@ let g:ale_linters = {
 
 let g:ale_javascript_eslint_use_global = 1
 let g:ale_javascript_eslint_executable = 'eslint_d'
-let g:typescript_indent_disable = 1
-let g:typescript_opfirst='\%([<>=,?^%|*/&]\|\([-:+]\)\1\@!\|!=\|in\%(stanceof\)\=\>\)'
-let g:typescript_compiler_binary = 'tsc'
-let g:typescript_compiler_options = ''
-
-
 
 "" ale fixers
-" let g:ale_fixers = {
-" \ '*': ['remove_trailing_lines', 'trim_whitespace'],
-" \ 'javascript': ['eslint', 'prettier']
-" \ 'tsx': ['eslint', 'prettier'],
-" \ 'typescript': ['eslint', 'prettier']
-" \}
+let g:ale_fixers = {
+\ '*': ['remove_trailing_lines', 'trim_whitespace'],
+\ 'javascript': ['eslint', 'prettier'],
+\ 'tsx': ['eslint', 'prettier'],
+\ 'typescript': ['eslint', 'prettier']
+\}
 
 let g:ale_typescript_prettier_use_local_config = 0
 let g:ale_fix_on_save = 1
@@ -625,7 +725,7 @@ let g:go_highlight_operators = 1
 let g:go_auto_type_info = 1
 let g:go_auto_sameids = 0
 let g:go_debug=['shell-commands']
-autocmd FileType go set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2 smartindent
+
 " quickfix 이동 및 open/close
 " nnoremap <C-n> :cnext<CR>
 nnoremap <C-p> :cprevious<CR>
@@ -635,27 +735,30 @@ nnoremap <LocalLeader>q :call ToggleQuickfixList()<CR>
 nnoremap <LocalLeader>c :GoCoverageToggle<CR>
 
 " typescript
-au FileType typescript nmap <buffer> <Tab><Tab>r :!ts-node %<CR>
+" au FileType typescript nmap <buffer> <Tab><Tab>r :!ts-node %<CR>
+"
+" " 자주 쓰는 기능들
+" autocmd FileType go nnoremap <Tab>b :GoBuild<CR>
+" autocmd FileType go nnoremap <Tab>r :GoRun<CR>
+" autocmd FileType go nnoremap <Tab><Tab>r :GoRun %<CR>
+" au FileType python nmap <buffer> <Tab><Tab>r :!python %<CR>
+"
+" autocmd FileType go nnoremap <Tab>t :GoTest<CR>
+" autocmd FileType go nnoremap <Tab><Tab>t :GoTestFunc<CR>
+" autocmd FileType go nnoremap <Tab>c :GoCoverageToggle<CR>
 
-" 자주 쓰는 기능들
-autocmd FileType go nnoremap <Tab>b :GoBuild<CR>
-autocmd FileType go nnoremap <Tab>r :GoRun<CR>
-autocmd FileType go nnoremap <Tab><Tab>r :GoRun %<CR>
-au FileType python nmap <buffer> <Tab><Tab>r :!python %<CR>
-
-autocmd FileType go nnoremap <Tab>t :GoTest<CR>
-autocmd FileType go nnoremap <Tab><Tab>t :GoTestFunc<CR>
-autocmd FileType go nnoremap <Tab>c :GoCoverageToggle<CR>
-autocmd FileType go nnoremap <F9> :GoDebugBreakpoint<CR>
-autocmd FileType go nnoremap <F5> :GoDebugStart<CR>
-autocmd FileType go nnoremap <F6> :GoDebugContinue<CR>
-autocmd FileType go nnoremap <F7> :GoDebugNext<CR>
-autocmd FileType go nnoremap <F8> :GoDebugStepOut<CR>
-
-let g:go_debug_windows = {
-      \ 'vars':       'rightbelow 60vnew',
-      \ 'stack':      'rightbelow 10new',
-\ }
+if (empty($TMUX))
+  if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif
 
 syntax enable
 set background=dark
@@ -667,9 +770,7 @@ let g:sonokai_enable_italic = 1
 let g:sonokai_disable_italic_comment = 1
 " best top3 theme sonokai
 colorscheme onedark
-set termguicolors     " enable true colors support
-" hybird theme setup
-let g:airline_theme = 'onedark'
+let g:airline_theme = 'papercolor'
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
@@ -679,14 +780,23 @@ let g:airline_powerline_fonts = 1
 filetype on
 filetype plugin indent on
 
-let g:lightline = { 'colorscheme': 'onedark' }
+let g:lightline = { 'colorscheme': 'PaperColor' }
+
+let java_highlight_functions = 1
+let java_highlight_all = 1
+" If you are trying this at runtime, you need to reload the syntax file
+" Some more highlights, in addition to those suggested by cmcginty
+highlight link javaScopeDecl Statement
+highlight link javaType Type
+highlight link javaDocTags PreProc
+let g:vimspector_enable_mappings = 'HUMAN'
 
 " code folding
 set foldmethod=indent
 set foldlevel=99
 
 "java compile and run
-"nnoremap <leader>ac :cd %:p:h <CR> :! javac %:t<CR> :! java %:t:r<CR>
+nnoremap <leader>ac <CR> :! javac %<CR> :! java -cp %:p:h %:t:r<CR>
 
 " wrap toggle
 setlocal nowrap
@@ -738,12 +848,12 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "norm
 let NERDTreeIgnore = ['\.pyc$', '__pycache__']
 let NERDTreeMinimalUI = 1
 let NERDTreeShowHidden = 1
-let g:nerdtree_open = 1
+let g:nerdtree_open = 0
 let g:NERDTreeWinPos = "left"
-let g:tagbar_left = 1
+let g:tagbar_left = 0
 map <leader>n :call NERDTreeToggle()<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
-function NERDTreeToggle()
+ function NERDTreeToggle()
     NERDTreeTabsToggle
     if g:nerdtree_open == 1
         let g:nerdtree_open = 0
@@ -753,7 +863,7 @@ function NERDTreeToggle()
     endif
 endfunction
 
-" function! StartUp()
+ " function! StartUp()
 "     if 0 == argc()
 "         NERDTree
 "     end
@@ -761,19 +871,18 @@ endfunction
 " autocmd VimEnter * call StartUp()
 
 " ale
-map <C-e> <Plug>(ale_next_wrap)
-map <C-r> <Plug>(ale_previous_wrap)
+" map <C-e> <Plug>(ale_next_wrap)
+" map <C-r> <Plug>(ale_previous_wrap)
 
 " tags
 map <leader>t :TagbarToggle<CR>
 
-" copy, cut and paste
+ " copy, cut and paste
 vmap <C-c> "+y
 vmap <C-x> "+c
 vmap <C-v> c<ESC>"+p
 imap <C-v> <ESC>"+pa
 
-set tags=./tags,tags;$HOME
 
 " disable autoindent when pasting text
 " source: https://coderwall.com/p/if9mda/automatically-set-paste-mode-in-vim-when-pasting-in-insert-mode
@@ -862,11 +971,11 @@ let g:closetag_regions = {
     \ 'javascriptreact': 'jsxRegion',
     \ }
 
-" Shortcut for closing tags, default is '>
+
+ " Shortcut for closing tags, default is '>
 "
 let g:closetag_shortcut = '>'
 
 " Add > at current position without closing the current tag, default is ''
 "
-"let g:closetag_close_shortcut = '<leader>>'a
--
+let g:closetag_close_shortcut = '<leader>>'
